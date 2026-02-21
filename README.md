@@ -1,4 +1,4 @@
-# Avinash Shinde — Award-Level Developer Portfolio
+# Avinash Shinde — Portfolio
 
 An editorial, kinetic, and high-impact portfolio built for **Avinash Shinde** (Creative Developer & BCS Graduate). This project pushes the boundaries of web aesthetics using a "Chrome-Futurism" design language.
 
