@@ -8,13 +8,21 @@ export default function CustomCursor() {
   const ringRef = useRef(null);
   const [isHovering, setIsHovering] = useState(false);
   const [isPointer, setIsPointer] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const pos = useRef({ x: 0, y: 0 });
   const ringPos = useRef({ x: 0, y: 0 });
   const raf = useRef(null);
 
   useEffect(() => {
-    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-    if (isMobile) return;
+    // Advanced mobile detection
+    const checkMobile = () => {
+      return /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth < 768 || document.documentElement.ontouchstart !== undefined;
+    };
+
+    if (checkMobile()) {
+      setIsMobile(true);
+      return;
+    }
 
     const onMove = (e) => {
       pos.current = { x: e.clientX, y: e.clientY };
@@ -42,6 +50,8 @@ export default function CustomCursor() {
       document.body.style.cursor = '';
     };
   }, []);
+
+  if (isMobile) return null;
 
   return (
     <>

@@ -1,12 +1,6 @@
-'use client';
-
-import { useEffect, useRef, useState } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { motion } from 'framer-motion';
+import Image from 'next/image';
 import projects from '@/data/projects.json';
-
-gsap.registerPlugin(ScrollTrigger);
+import ProjectsAnimation from '@/components/animations/ProjectsAnimation';
 
 function ProjectCard({ project, index }) {
     return (
@@ -33,7 +27,31 @@ function ProjectCard({ project, index }) {
                 inset: 0,
                 background: 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 60%, rgba(255,255,255,0.05) 100%)',
                 pointerEvents: 'none',
+                zIndex: 10,
             }} />
+
+            {/* Image Background with color fade */}
+            {project.image && (
+                <div style={{
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0, bottom: '25%',
+                    overflow: 'hidden',
+                    zIndex: 0,
+                }}>
+                    <Image
+                        src={project.image}
+                        alt={project.title}
+                        fill
+                        style={{ objectFit: 'cover', objectPosition: 'top' }}
+                        sizes="(max-width: 768px) 100vw, 800px"
+                    />
+                    <div style={{
+                        position: 'absolute',
+                        inset: 0,
+                        background: `linear-gradient(to bottom, transparent 10%, ${project.color} 95%)`
+                    }} />
+                </div>
+            )}
 
             {/* Index */}
             <span style={{
@@ -59,6 +77,7 @@ function ProjectCard({ project, index }) {
                 display: 'flex',
                 gap: '0.5rem',
                 alignItems: 'center',
+                zIndex: 2,
             }}>
                 <span style={{
                     fontFamily: 'var(--font-display)',
@@ -81,10 +100,13 @@ function ProjectCard({ project, index }) {
                         fontWeight: 500,
                         letterSpacing: '0.1em',
                         textTransform: 'uppercase',
-                        color: 'var(--color-mid-gray)',
+                        color: 'var(--color-dark)',
                         padding: '0.25rem 0.65rem',
                         borderRadius: '100px',
-                        border: '1px solid rgba(138,130,120,0.25)',
+                        border: '1px solid rgba(0,0,0,0.1)',
+                        background: 'rgba(255,255,255,0.9)',
+                        backdropFilter: 'blur(8px)',
+                        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
                     }}>
                         {t}
                     </span>
@@ -150,151 +172,133 @@ function ProjectCard({ project, index }) {
     );
 }
 
-// Mobile swipeable carousel
 function MobileCarousel() {
-    const [active, setActive] = useState(0);
     return (
-        <div style={{ padding: '3rem 1.5rem' }}>
-            <div style={{ overflow: 'hidden' }}>
-                <motion.div
-                    style={{ display: 'flex', gap: '1.5rem' }}
-                    drag="x"
-                    dragConstraints={{ left: -(projects.length - 1) * 300, right: 0 }}
-                    onDragEnd={(e, { offset }) => {
-                        if (offset.x < -50 && active < projects.length - 1) setActive((p) => p + 1);
-                        if (offset.x > 50 && active > 0) setActive((p) => p - 1);
+        <div style={{ padding: '0 1.5rem 3rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+            {projects.map((p) => (
+                <div
+                    key={p.id}
+                    style={{
+                        width: '100%',
+                        minHeight: '60vh',
+                        borderRadius: '16px',
+                        background: p.color,
+                        padding: '3rem 2rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'flex-end',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        boxShadow: '0 10px 40px rgba(0,0,0,0.05)',
                     }}
                 >
-                    {projects.map((p, i) => (
-                        <motion.div
-                            key={p.id}
-                            animate={{ scale: i === active ? 1 : 0.9, opacity: i === active ? 1 : 0.6 }}
-                            transition={{ duration: 0.4 }}
+                    {/* Image Background */}
+                    {p.image && (
+                        <div style={{
+                            position: 'absolute',
+                            top: 0, left: 0, right: 0, bottom: '30%',
+                            overflow: 'hidden',
+                            zIndex: 0,
+                        }}>
+                            <Image
+                                src={p.image}
+                                alt={p.title}
+                                fill
+                                style={{ objectFit: 'cover', objectPosition: 'top center' }}
+                                sizes="100vw"
+                            />
+                            <div style={{
+                                position: 'absolute',
+                                inset: 0,
+                                background: `linear-gradient(to bottom, transparent 10%, ${p.color} 95%)`
+                            }} />
+                        </div>
+                    )}
+
+                    <div style={{
+                        position: 'absolute', top: '1.5rem', left: '1.5rem',
+                        display: 'flex', gap: '0.4rem', flexWrap: 'wrap', maxWidth: 'calc(100% - 3rem)', zIndex: 2
+                    }}>
+                        <span style={{
+                            fontFamily: 'var(--font-display)', fontWeight: 600,
+                            fontSize: '0.55rem', letterSpacing: '0.12em', textTransform: 'uppercase',
+                            color: 'var(--color-dark)', background: '#ffffff',
+                            padding: '0.15rem 0.5rem', borderRadius: '100px',
+                            border: `1px solid rgba(0,0,0,0.1)`,
+                            boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+                        }}>{p.year}</span>
+                        {p.tags.map((t) => (
+                            <span key={t} style={{
+                                fontFamily: 'var(--font-display)', fontSize: '0.5rem',
+                                fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase',
+                                color: 'var(--color-dark)', padding: '0.15rem 0.4rem',
+                                borderRadius: '100px', border: '1px solid rgba(0,0,0,0.1)',
+                                background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(8px)',
+                                boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+                            }}>{t}</span>
+                        ))}
+                    </div>
+                    <div style={{ position: 'relative', zIndex: 2 }}>
+                        <h3 style={{
+                            fontFamily: 'var(--font-display)', fontWeight: 800,
+                            fontSize: 'clamp(1.75rem, 8vw, 3rem)', letterSpacing: '-0.04em',
+                            lineHeight: 1, color: 'var(--color-dark)', marginBottom: '0.6rem',
+                        }}>{p.title}</h3>
+                        <p style={{
+                            fontFamily: 'var(--font-body)', fontSize: '0.8rem',
+                            color: p.accent, marginBottom: '0.4rem', lineHeight: 1.4
+                        }}>{p.tagline}</p>
+
+                        <a
+                            href={p.link}
+                            target="_blank"
+                            rel="noreferrer"
+                            data-cursor="pointer"
                             style={{
-                                minWidth: '80vw',
-                                height: '60vh',
-                                borderRadius: '12px',
-                                background: p.color,
-                                flexShrink: 0,
-                                padding: '3rem 2rem 3rem',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'flex-end',
-                                position: 'relative',
-                                overflow: 'hidden',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                marginTop: '1.25rem',
+                                padding: '0.6rem 1.25rem',
+                                background: 'var(--color-dark)',
+                                color: 'var(--color-pearl)',
+                                borderRadius: '100px',
+                                fontFamily: 'var(--font-display)',
+                                fontSize: '0.65rem',
+                                fontWeight: 600,
+                                letterSpacing: '0.05em',
+                                textTransform: 'uppercase',
+                                textDecoration: 'none',
+                                width: 'fit-content'
                             }}
                         >
-                            <div style={{
-                                position: 'absolute', top: '1.5rem', left: '1.5rem',
-                                display: 'flex', gap: '0.4rem', flexWrap: 'wrap', maxWidth: 'calc(100% - 3rem)'
-                            }}>
-                                <span style={{
-                                    fontFamily: 'var(--font-display)', fontWeight: 600,
-                                    fontSize: '0.6rem', letterSpacing: '0.12em', textTransform: 'uppercase',
-                                    color: p.accent, background: `${p.accent}18`,
-                                    padding: '0.2rem 0.6rem', borderRadius: '100px',
-                                    border: `1px solid ${p.accent}30`,
-                                }}>{p.year}</span>
-                                {p.tags.map((t) => (
-                                    <span key={t} style={{
-                                        fontFamily: 'var(--font-display)', fontSize: '0.55rem',
-                                        fontWeight: 500, letterSpacing: '0.1em', textTransform: 'uppercase',
-                                        color: 'rgba(26,23,20,0.5)', padding: '0.2rem 0.5rem',
-                                        borderRadius: '100px', border: '1px solid rgba(138,130,120,0.2)',
-                                    }}>{t}</span>
-                                ))}
-                            </div>
-                            <h3 style={{
-                                fontFamily: 'var(--font-display)', fontWeight: 800,
-                                fontSize: 'clamp(2.2rem, 8vw, 3.5rem)', letterSpacing: '-0.04em',
-                                lineHeight: 1, color: 'var(--color-dark)', marginBottom: '0.75rem',
-                            }}>{p.title}</h3>
-                            <p style={{
-                                fontFamily: 'var(--font-body)', fontSize: '0.875rem',
-                                color: p.accent, marginBottom: '0.4rem',
-                            }}>{p.tagline}</p>
-                        </motion.div>
-                    ))}
-                </motion.div>
-            </div>
-            {/* Dots */}
-            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginTop: '1.5rem' }}>
-                {projects.map((_, i) => (
-                    <button key={i} onClick={() => setActive(i)} style={{
-                        width: i === active ? '24px' : '8px',
-                        height: '8px',
-                        borderRadius: '100px',
-                        background: i === active ? 'var(--color-dark)' : 'var(--color-sand)',
-                        border: 'none', cursor: 'pointer',
-                        transition: 'width 0.3s, background 0.2s',
-                        padding: 0,
-                    }} />
-                ))}
-            </div>
+                            View Project
+                        </a>
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }
 
 export default function Projects() {
-    const containerRef = useRef(null);
-    const trackRef = useRef(null);
-    const [isMobile, setIsMobile] = useState(false);
-
-    useEffect(() => {
-        setIsMobile(window.innerWidth < 768);
-        const onResize = () => setIsMobile(window.innerWidth < 768);
-        window.addEventListener('resize', onResize);
-        return () => window.removeEventListener('resize', onResize);
-    }, []);
-
-    useEffect(() => {
-        if (isMobile) return;
-        const ctx = gsap.context(() => {
-            const track = trackRef.current;
-            if (!track) return;
-
-            const totalWidth = track.scrollWidth - window.innerWidth;
-
-            gsap.to(track, {
-                x: -totalWidth,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: containerRef.current,
-                    start: 'top top',
-                    end: `+=${totalWidth + window.innerWidth * 0.5}`,
-                    pin: true,
-                    scrub: 1,
-                    anticipatePin: 1,
-                },
-            });
-        }, containerRef);
-        return () => ctx.revert();
-    }, [isMobile]);
-
     return (
-        <section id="projects" ref={containerRef} style={{ background: 'var(--color-pearl)', position: 'relative' }}>
-            {isMobile ? (
-                <>
+        <ProjectsAnimation>
+            <section id="projects" style={{ background: 'var(--color-pearl)', position: 'relative' }}>
+
+                {/* Mobile View */}
+                <div className="mobile-only" style={{ display: 'block' }}>
                     <div style={{ padding: '4rem 1.5rem 0' }}>
-                        <p style={{
-                            fontFamily: 'var(--font-display)', fontWeight: 500,
-                            fontSize: 'var(--text-xs)', letterSpacing: '0.2em',
-                            textTransform: 'uppercase', color: 'var(--color-warm-gray)',
-                            marginBottom: '1.5rem',
-                        }}>03 / Work</p>
-                        <h2 style={{
-                            fontFamily: 'var(--font-display)', fontWeight: 800,
-                            fontSize: 'var(--text-2xl)', letterSpacing: '-0.04em',
-                            lineHeight: 0.95, color: 'var(--color-dark)',
-                        }}>
+                        <p className="heading-label">03 / Work</p>
+                        <h2 className="heading-title" style={{ marginBottom: '2rem' }}>
                             Selected<br />
                             <span style={{ color: 'var(--color-warm-gray)' }}>Projects.</span>
                         </h2>
                     </div>
                     <MobileCarousel />
-                </>
-            ) : (
-                <div style={{ height: '100vh', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
+                </div>
+
+                {/* Desktop View */}
+                <div className="desktop-only" style={{ height: '100vh', overflow: 'hidden', display: 'flex', alignItems: 'center' }}>
                     <div style={{
                         padding: '0 5rem',
                         position: 'absolute',
@@ -303,38 +307,24 @@ export default function Projects() {
                         transform: 'translateY(-50%)',
                         zIndex: 1,
                     }}>
-                        <p style={{
-                            fontFamily: 'var(--font-display)', fontWeight: 500,
-                            fontSize: 'var(--text-xs)', letterSpacing: '0.2em',
-                            textTransform: 'uppercase', color: 'var(--color-warm-gray)',
-                            marginBottom: '1.5rem',
-                        }}>03 / Work</p>
-                        <h2 style={{
-                            fontFamily: 'var(--font-display)', fontWeight: 800,
-                            fontSize: 'var(--text-2xl)', letterSpacing: '-0.04em',
-                            lineHeight: 0.95, color: 'var(--color-dark)',
-                            marginBottom: '2rem',
-                        }}>
+                        <p className="heading-label">03 / Work</p>
+                        <h2 className="heading-title" style={{ marginBottom: '2rem' }}>
                             Selected<br />
                             <span style={{ color: 'var(--color-warm-gray)' }}>Projects.</span>
                         </h2>
-                        <p style={{
-                            fontFamily: 'var(--font-body)', fontWeight: 300,
-                            fontSize: 'var(--text-s)', color: 'var(--color-mid-gray)',
-                            lineHeight: 1.7, maxWidth: '260px',
-                        }}>
+                        <p className="heading-subtitle" style={{ maxWidth: '260px' }}>
                             A selection of recent work spanning interactive experiences, platforms, and design systems.
                         </p>
                     </div>
 
-                    {/* Horizontal track */}
+                    {/* Horizontal track tracked by Animation Wrapper */}
                     <div
-                        ref={trackRef}
+                        data-animate="projects-track"
                         className="h-scroll-track"
                         style={{
                             display: 'flex',
                             gap: '4rem',
-                            paddingLeft: '65vw', // Even more offset to show title clearly at start
+                            paddingLeft: '65vw',
                             paddingRight: '15vw',
                             alignItems: 'center',
                             willChange: 'transform',
@@ -347,7 +337,8 @@ export default function Projects() {
                         ))}
                     </div>
                 </div>
-            )}
-        </section>
+
+            </section>
+        </ProjectsAnimation>
     );
 }

@@ -96,14 +96,14 @@ export default function Surprise() {
                 <div style={{
                     display: 'flex',
                     gap: 0,
-                    animation: 'marquee 12s linear infinite',
+                    animation: 'marquee 6s linear infinite', // Accelerated from 12s
                     whiteSpace: 'nowrap',
                 }}>
                     {[1, 2, 3].map((i) => (
                         <span key={i} style={{
                             fontFamily: 'var(--font-display)',
                             fontWeight: 800,
-                            fontSize: 'clamp(3rem, 8vw, 7rem)',
+                            fontSize: 'clamp(1rem, 4vw, 7rem)', // Shrunk further
                             letterSpacing: '-0.05em',
                             background: 'var(--gradient-chrome-text)',
                             backgroundSize: '200% auto',
@@ -135,13 +135,13 @@ export default function Surprise() {
                 }}>
                     Always
                 </p>
-                <div style={{ overflow: 'hidden', height: 'clamp(4rem, 10vw, 9rem)' }}>
+                <div style={{ overflow: 'hidden', height: 'clamp(2.5rem, 10vw, 9rem)' }}>
                     <h2
                         ref={wordRef}
                         style={{
                             fontFamily: 'var(--font-display)',
                             fontWeight: 800,
-                            fontSize: 'clamp(4rem, 10vw, 9rem)',
+                            fontSize: 'clamp(1.8rem, 8vw, 9rem)', // Shrunk further
                             letterSpacing: '-0.05em',
                             lineHeight: 1,
                             color: 'var(--color-dark)',

@@ -12,7 +12,15 @@ const links = [
 
 export default function Navbar() {
     const [hidden, setHidden] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const lastY = useRef(0);
+
+    useEffect(() => {
+        setIsMobile(window.innerWidth < 768);
+        const onResize = () => setIsMobile(window.innerWidth < 768);
+        window.addEventListener('resize', onResize);
+        return () => window.removeEventListener('resize', onResize);
+    }, []);
 
     useEffect(() => {
         const handler = () => {
@@ -35,14 +43,15 @@ export default function Navbar() {
                 left: 0,
                 right: 0,
                 zIndex: 100,
-                padding: '1.5rem 3rem',
+                padding: '1.5rem 5vw',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                background: 'rgba(248,245,240,0.7)',
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
-                borderBottom: '1px solid rgba(200,191,181,0.3)',
+                background: 'rgba(248,245,240,0.6)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                borderBottom: '1px solid rgba(255,255,255,0.4)',
+                boxShadow: '0 4px 30px rgba(0, 0, 0, 0.05)'
             }}
         >
             <a
@@ -59,20 +68,20 @@ export default function Navbar() {
                 AS<span style={{ color: 'var(--color-warm-gray)' }}>.</span>
             </a>
 
-            <nav style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }}>
-                {links.map((l) => (
+            <nav style={{ display: 'flex', gap: isMobile ? '1rem' : '2.5rem', alignItems: 'center' }}>
+                {!isMobile && links.map((l) => (
                     <a
                         key={l.label}
                         href={l.href}
                         data-cursor="pointer"
                         style={{
                             fontFamily: 'var(--font-display)',
-                            fontWeight: 500,
+                            fontWeight: 600,
                             fontSize: '0.8rem',
-                            letterSpacing: '0.08em',
+                            letterSpacing: '0.1em',
                             textTransform: 'uppercase',
                             color: 'var(--color-mid-gray)',
-                            transition: 'color 0.2s',
+                            transition: 'color 0.3s ease',
                         }}
                         onMouseEnter={(e) => (e.target.style.color = 'var(--color-dark)')}
                         onMouseLeave={(e) => (e.target.style.color = 'var(--color-mid-gray)')}
@@ -85,21 +94,24 @@ export default function Navbar() {
                     data-cursor="pointer"
                     style={{
                         fontFamily: 'var(--font-display)',
-                        fontWeight: 600,
+                        fontWeight: 700,
                         fontSize: '0.75rem',
-                        letterSpacing: '0.06em',
+                        letterSpacing: '0.1em',
                         textTransform: 'uppercase',
                         color: 'var(--color-pearl)',
                         background: 'var(--color-dark)',
-                        padding: '0.5rem 1.2rem',
+                        padding: '0.7rem 1.6rem',
                         borderRadius: '100px',
-                        transition: 'background 0.2s, color 0.2s',
+                        transition: 'background 0.3s ease, transform 0.3s ease, color 0.3s ease',
+                        boxShadow: '0 4px 14px 0 rgba(0,0,0,0.1)',
                     }}
                     onMouseEnter={(e) => {
                         e.target.style.background = 'var(--color-mid-gray)';
+                        e.target.style.transform = 'translateY(-2px)';
                     }}
                     onMouseLeave={(e) => {
                         e.target.style.background = 'var(--color-dark)';
+                        e.target.style.transform = 'translateY(0)';
                     }}
                 >
                     Résumé
