@@ -7,34 +7,47 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function ProjectsAnimation({ children }) {
-    const containerRef = useRef(null);
+    const sectionRef = useRef(null);
 
     useEffect(() => {
-        const isMobile = window.innerWidth < 768;
-        if (isMobile) return;
+        const section = sectionRef.current;
+        if (!section) return;
 
-        const ctx = gsap.context(() => {
-            const track = document.querySelector('[data-animate="projects-track"]');
-            if (!track) return;
+        const track = section.querySelector('[data-animate="projects-track"]');
+        if (!track) return;
 
-            const totalWidth = track.scrollWidth - window.innerWidth;
+        let scrollTriggerInstance;
+
+        const timer = setTimeout(() => {
+            const scrollDistance = track.scrollWidth - window.innerWidth;
+            if (scrollDistance <= 0) return;
 
             gsap.to(track, {
-                x: -totalWidth,
+                x: -scrollDistance,
                 ease: 'none',
                 scrollTrigger: {
-                    trigger: containerRef.current,
+                    trigger: section,
                     start: 'top top',
-                    end: `+=${totalWidth + window.innerWidth * 0.5}`,
+                    end: `+=${scrollDistance}`,
                     pin: true,
                     scrub: 1,
                     anticipatePin: 1,
+                    invalidateOnRefresh: true,
+                    onEnter: (self) => { scrollTriggerInstance = self; },
                 },
             });
-        }, containerRef);
+        }, 100);
 
-        return () => ctx.revert();
+        return () => {
+            clearTimeout(timer);
+            scrollTriggerInstance?.kill();
+            ScrollTrigger.getAll().forEach(st => st.kill());
+        };
     }, []);
 
-    return <div ref={containerRef} style={{ display: 'contents' }}>{children}</div>;
+    return (
+        <div ref={sectionRef}>
+            {children}
+        </div>
+    );
 }
